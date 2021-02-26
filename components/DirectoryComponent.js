@@ -9,7 +9,8 @@ import { ListItem} from "react-native-elements";
 //Simillar to the map() method, FlatList will iterate over every item of the array we have provided to it's data prop. Then it will run the function we gave to it's renderItem prop on every single one of those items. So in the rednerDirectoryItem function we can access every item that has been iterated over as "item".
 //In the renderDirectoryComponent we will return the <ListItem> component. It comes with it's own props:title-for the name of each item;subtitle-for the description; leftAvatar prop requires an object(that is why we are using 2 sets of {}-the first one to embed JS inside JSX and the second set- for the object.).
 //This object has a property of source and for it's value we are setting up a function called "require()"- it is provided to us from node.js. We will give the require function as an argument the location of the image we want to use
-
+// The ListItem component comes with it's own onPress built in prop.So when this component is pressed on a mobile device, the function we give to the onPress prop will automatically fire. This is how we will trigger the onCampsiteSelect event handler that we passed as props to the Directory component from the Main component.
+//In that function we have access to the id of the pressed campsite
 
 function Directory(props) {
 
@@ -18,6 +19,7 @@ function Directory(props) {
             <ListItem
                 title={item.name}
                 subtitle={item.description}
+                onPress={() => props.onPress(item.id)}
                 leftAvatar={{ source: require("./images/react-lake.jpg")}}
             />
 
