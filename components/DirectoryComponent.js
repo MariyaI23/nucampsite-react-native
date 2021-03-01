@@ -1,6 +1,7 @@
-import React from "react";
+import React, { Component } from "react";
 import { FlatList } from "react-native";
 import { ListItem} from "react-native-elements";
+import { CAMPSITES } from "../shared/campsites";
 
 //FlatList is somewhat simillar to <ol> tag and ListItem - to <li>
 //FlatList has several props: data expects and array of data;renderItem-will specify how to render each item in the list. It will do that by using a call back function
@@ -12,27 +13,52 @@ import { ListItem} from "react-native-elements";
 // The ListItem component comes with it's own onPress built in prop.So when this component is pressed on a mobile device, the function we give to the onPress prop will automatically fire. This is how we will trigger the onCampsiteSelect event handler that we passed as props to the Directory component from the Main component.
 //In that function we have access to the id of the pressed campsite
 
-function Directory(props) {
+//With the static JS keyword we will be able to set the title that will show in the navigation(in the header)
+//Each screen component in our app is provided with the "navigation" prop automatically. This prop has many functions that dispatch navigation actions on the Route's router.
+// Since we set the Directory component as a "screen" in the DirectoryNavigator component, that way the Directory component has automatically received the navigation prop and all if it's functions including "navigate".
+// We will use that specific function to route the user to a campsite when he presses on it.
+//Since the "navigate" function is all that is needed here from the navigation prop, we can destructure it.
+//The onPress attribute that was calling the onPress function which was calling the onCampsite select function had to be changed as we are no longer using the last function from the Main component.
+//Instead we will use the navigate function which will take 2 arguments. The first one is the name of the screen we want to navigate to, and the second(optional) argument adds more parameters to the route.
+//In this case that addl parameter will be the campsiteId and we will give it the value of the id of the campsite that was pressed.Now when an item is pressed it will call this navigate function in order to switch to the CampsiteInfo screen, and the camspiteId parameter will be used to pass the correct campsite object to it.
 
-    const renderDirectoryItem = ({item}) => {
-        return (
-            <ListItem
-                title={item.name}
-                subtitle={item.description}
-                onPress={() => props.onPress(item.id)}
-                leftAvatar={{ source: require("./images/react-lake.jpg")}}
-            />
 
-        );
+class Directory extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            campsites: CAMPSITES
+        };
+    }
+
+    static navigationOptions = {
+        title: "Directory"
     };
-    
-    return (
-        <FlatList
-            data={props.campsites}
-            renderItem={renderDirectoryItem}
-            keyExtractor={item => item.id.toString()}
-        />
-    );
+
+    render() {
+        const { navigate } = this.props.navigation;
+        const renderDirectoryItem = ({item}) => {
+            return (
+                <ListItem
+                    title={item.name}
+                    subtitle={item.description}
+                   // onPress={() => props.onPress(item.id)}
+                      onPress = {() => navigate("CampsiteInfo", { campsiteId: item.id })}
+                    leftAvatar={{ source: require("./images/react-lake.jpg")}}
+                />
+
+            );
+        };
+        
+        return (
+            <FlatList
+                data={this.state.campsites}
+                renderItem={renderDirectoryItem}
+                keyExtractor={item => item.id.toString()}
+            />
+        );
+    }
 }
 
 export default Directory;
