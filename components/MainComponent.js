@@ -1,8 +1,10 @@
 import React, { Component } from "react";
+import Home from "./HomeComponent";
 import Directory from "./DirectoryComponent";
 import CampsiteInfo from "./CampsiteInfoComponent";
 import { View, Platform} from "react-native";
 import { createStackNavigator } from "react-navigation-stack";
+import { createDrawerNavigator } from "react-navigation-drawer";
 import { createAppContainer } from "react-navigation";
 
 //The createStackNavigator is a function which will store in the DirectoryNavigator. The function has 1 required argument called the routeConfig object.This object will hold the components which will be part of the navigation stack.
@@ -29,7 +31,39 @@ const DirectoryNavigator = createStackNavigator(
     }
 );
 
-const AppNavigator = createAppContainer(DirectoryNavigator);
+const HomeNavigator = createStackNavigator(
+    {
+        Home: { screen: Home},
+        
+    },
+    {
+        defaultNavigationOptions: {
+            headerStyle: {
+                backgroundColor: "#5637DD"
+            },
+            headerTintColor: "#fff",
+            headerTitleStyle: {
+                color: "#fff"
+            }
+        }
+    }
+);
+
+//Creating the drawer navigator. The createDrawerNavigator function will have the first argument be an object that contains the screens(views) that will be in the drawer
+//We want to route through the stack navigator, that is why we are setting up the screens to render the HomeNavigator and the DirectoryNavigator instead of just the Home and the Directory components.
+//In the optional second argument for addl configuration we can set the drawer's background color
+
+const MainNavigator = createDrawerNavigator(
+    {
+        Home: { screen: HomeNavigator },
+        Directory: { screen: DirectoryNavigator }
+    },
+    {
+        drawerBackgroundColor: "#CEC8FF"
+    }
+)
+
+const AppNavigator = createAppContainer(MainNavigator);
 
 //The flex: 1 in the View start tag is to make a flexible component of normal size
 //The second prop in the Dircetory component-onPress-we will pass it an arrow function that takes the campsiteId as a parameter, and it containes the onCampsiteSelect event handler inside the funnction's body.
