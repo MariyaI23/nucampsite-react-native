@@ -4,20 +4,33 @@ import Directory from "./DirectoryComponent";
 import CampsiteInfo from "./CampsiteInfoComponent";
 import About from "./AboutComponent";
 import Contact from "./ContactComponent";
-
-import { View, Platform } from "react-native";
+import { View, Platform, StyleSheet, Text, ScrollView, Image } from "react-native";
 import { createStackNavigator } from "react-navigation-stack";
-import { createDrawerNavigator } from "react-navigation-drawer";
+import { createDrawerNavigator, DrawerItems } from "react-navigation-drawer";
 import { createAppContainer } from "react-navigation";
+import { Icon } from "react-native-elements";
+import SafeAreaView from "react-native-safe-area-view";
 
 //The createStackNavigator is a function which return value we will store in the DirectoryNavigator. The function has 1 required argument called the routeConfig object.This object will hold the components which will be part of the navigation stack.
 //The second argument of the createStackNavigator function is optional. The initialRoutName-sets the default view of whichever component we want displyed first when the app loads.
 //The defaultNavigationOptions object will help to configure the settings for the header.These are built-in settings, not custom ones
 //We will be passing the createStackNavigator(or rather tha variable DirectoryNavigator which holds it's return value) to the next function we imported-createAppContainer. We will assign the return value of createAppContainer to a variable named AppNavigator. The createAppContainer will return our top-level Navigator Component and connect it to the React-Native environment. Most often we will have to wrapp our top navigator component in a createAppContainer like this.
+//We can specify specific navigationOptions for each screen. We are passing the navigation prop to the onPress event so we can use the built-in function toggleDrawer() of the navigation prop. That way when the icon is pressed it will open the side drawer.
+//In the Home/About/Contact Navigators we can continue to use the default Navigations option as it is only one screen. We can destructure the navigation prop and use an arrow function. After the => we are using a set of () around the {} so the function doesn't think that we are entering a function body as we are not. We are defining an object literal. As that is also surrounded by {} the arrow function might consider it as the body of the function.
 
 const DirectoryNavigator = createStackNavigator(
   {
-    Directory: { screen: Directory },
+    Directory: { 
+      screen: Directory,
+      navigationOptions: ({navigation}) => ({
+        headerLeft: <Icon
+            name="list"
+            type="font-awesome"
+            iconStyle={styles.stackIcon} 
+            onPress={() => navigation.toggleDrawer()}
+        />
+      })
+     },
     CampsiteInfo: { screen: CampsiteInfo },
   },
   {
@@ -39,7 +52,7 @@ const HomeNavigator = createStackNavigator(
     Home: { screen: Home },
   },
   {
-    defaultNavigationOptions: {
+    defaultNavigationOptions: ({navigation}) => ({
       headerStyle: {
         backgroundColor: "#5637DD",
       },
@@ -47,7 +60,13 @@ const HomeNavigator = createStackNavigator(
       headerTitleStyle: {
         color: "#fff",
       },
-    },
+      headerLeft: <Icon 
+          name="home"
+          type="font-awesome"
+          iconStyle={styles.stackIcon}
+          onPress={() => navigation.toggleDrawer()}
+      />
+    }),
   }
 );
 
@@ -56,7 +75,7 @@ const AboutNavigator = createStackNavigator(
     About: { screen: About },
   },
   {
-    defaultNavigationOptions: {
+    defaultNavigationOptions: ({navigation}) => ({
       headerStyle: {
         backgroundColor: "#5637DD",
       },
@@ -64,7 +83,13 @@ const AboutNavigator = createStackNavigator(
       headerTitleStyle: {
         color: "#fff",
       },
-    },
+      headerLeft: <Icon 
+          name="info-circle"
+          type="font-awesome"
+          iconStyle={styles.stackIcon}
+          onPress={() => navigation.toggleDrawer()}
+      />
+    }),
   }
 );
 
@@ -73,7 +98,7 @@ const ContactNavigator = createStackNavigator(
     Contact: { screen: Contact },
   },
   {
-    defaultNavigationOptions: {
+    defaultNavigationOptions: ({navigation}) => ({
       headerStyle: {
         backgroundColor: "#5637DD",
       },
@@ -81,24 +106,110 @@ const ContactNavigator = createStackNavigator(
       headerTitleStyle: {
         color: "#fff",
       },
-    },
+      headerLeft: <Icon
+          name="address-card"
+          type="font-awesome"
+          iconStyle={styles.stackIcon}
+          onPress={() => navigation.toggleDrawer()} 
+      />
+    }),
   }
 );
 
 //Creating the drawer navigator. The createDrawerNavigator function will have the first argument be an object that contains the screens(views) that will be in the drawer
 //We want to route through the stack navigator, that is why we are setting up the screens to render the HomeNavigator and the DirectoryNavigator instead of just the Home and the Directory components.
 //In the optional second argument for addl configuration we can set the drawer's background color
+//In order to be able to display the icons for each screen in the drawer as well we are adding the navigationOptions to each screen. We will set it up as an object containing the drawerIcon prop.We need to give this prop a function. 
+//We will pass this function the tintColor which is available through default. Inside that function body we can add the Icon. The color of that tintColor prop will vary depending on whether this is the active screen or not
+//If it is the active screen by default the tintColor will change to blue, if it is inactive it will set it to dark gray.
+//The CustomDrawerContentComponent will receive the props as the default parameter and it will return the View of our customized drawer
+//The SafeAreaView is specifically for the IPhone X and it defines a safe area where nothing else will be laid out. Inside the SafeAreaView start tag those are the recomended properties to be used.
+//The flex:1 style of the first inner View means that it'll take 1/3 of the space of the drawerHeader view, while flex: 2 will take 2/3 of that space
+//The DrawerItem component that was imported is used to show all these items in the drawer which items will be passed to this component as props using the spread syntax
+//After that we need to connect this CustomDrawerContectComponent to the MainNavigator. At the bottom of it we adding a prop called contentComponent and setting it to the CustomDrawerContectComponent. That will tell the MainNavigator to use the component we gave to render the content of the side drawer
 
+const CustomDrawerContentComponent = props => (
+    <ScrollView>
+         <SafeAreaView
+             style={styles.container}
+             forceInset={{top: "always", horizontal: "never"}}
+         >
+            <View style={styles.drawerHeader}>
+              <View style={{flex: 1}}>
+                  <Image
+                      source={require("./images/logo.png")}
+                      style={styles.drawerImage}
+                  />
+              </View>
+              <View style={{flex: 2}}>
+                  <Text style={styles.drawerHeaderText}>Nucamp</Text>
+              </View>
+            </View>
+            <DrawerItems {...props} />
+         </SafeAreaView>
+    </ScrollView>
+)
 
 const MainNavigator = createDrawerNavigator(
   {
-    Home: { screen: HomeNavigator },
-    Directory: { screen: DirectoryNavigator },
-    About: { screen: AboutNavigator },
-    Contact: { screen: ContactNavigator },
+    Home: { 
+      screen: HomeNavigator,
+      navigationOptions: {
+        drawerIcon: ({tintColor}) => (
+          <Icon
+              name="home"
+              type="font-awesome"
+              size={24}
+              color={tintColor} 
+          />
+        )
+      } 
+    },
+    Directory: { 
+      screen: DirectoryNavigator,
+      navigationOptions: {
+        drawerIcon: ({tintColor}) => (
+          <Icon 
+              name="list"
+              type="font-awesome"
+              size={24}
+              color={tintColor}
+          />
+        )
+      }
+     },
+    About: { 
+      screen: AboutNavigator,
+      navigationOptions: {
+        drawerLabel: "About Us",
+        drawerIcon: ({tintColor}) => (
+          <Icon 
+              name="info-circle"
+              type="font-awesome"
+              size={24}
+              color={tintColor}
+          />
+        )
+      }
+     },
+    Contact: { 
+      screen: ContactNavigator,
+      navigationOptions: {
+        drawerLabel: "Contact Us",
+        drawerIcon: ({tintColor}) => (
+          <Icon 
+              name="address-card"
+              type="font-awesome"
+              size={24}
+              color={tintColor}
+          />
+        )
+      }
+     },
   },
   {
     drawerBackgroundColor: "#CEC8FF",
+    contentComponent: CustomDrawerContentComponent
   }
 );
 
@@ -149,5 +260,34 @@ class Main extends Component {
     );
   }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1
+  },
+  drawerHeader: {
+    backgroundColor: "#5637DD",
+    height: 140,
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
+    flexDirection: "row"
+  },
+  drawerHeaderText: {
+    color: "#fff",
+    fontSize: 24,
+    fontWeight: "bold"
+  },
+  drawerImage: {
+    margin: 10,
+    height: 60,
+    width: 60
+  },
+  stackIcon: {
+    marginLeft: 10,
+    color: "#fff",
+    fontSize: 24
+  }
+});
 
 export default Main;
