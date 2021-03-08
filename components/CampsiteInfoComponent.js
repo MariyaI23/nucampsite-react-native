@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { Text, View, ScrollView, FlatList } from "react-native";
 import { Card, Icon } from "react-native-elements";
-import { CAMPSITES } from "../shared/campsites";
-import { COMMENTS } from "../shared/comments";
+import { connect } from "react-redux";
+import { baseUrl } from "../shared/baseUrl";
 
 //From the props we will pull the campsite object and send it another component - the RenderCampsite.
 //The RenderCampsite component will receive in it's parameter list the property "campsite" from the destructured campsite object it recieved as props. Later on we needed addl props so just added props in the parameter list so we can receive all of them. Then inside the function we still destructured the {campsite} prop
@@ -17,6 +17,16 @@ import { COMMENTS } from "../shared/comments";
 //The the markFavorite event handler and the favorite state data has to passed as props in the rendering of the RenderCampsite component at the bottom
 //The name prop of the Icon component is set up to check if it has received from props the favorite property as true or false. If true-that means the heart icon will be displayed in solid color, if false-it will just be outlined.
 
+//After introducing redux and json server we are now getting all of the state data from redux
+
+const mapStateToProps = state => {
+    return {
+        campsites: state.campsites,
+        comments: state.comments
+    }
+}
+
+
 function RenderCampsite(props) {
 
     const {campsite} = props;
@@ -24,7 +34,7 @@ function RenderCampsite(props) {
         return (
             <Card 
                 featuredTitle={campsite.name}
-                image={require("./images/react-lake.jpg")} >
+                image={{uri: baseUrl + campsite.image}} >
                 <Text style={{margin: 10}}>
                     {campsite.description}
                 </Text>
@@ -72,8 +82,6 @@ class CampsiteInfo extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            campsites: CAMPSITES,
-            comments: COMMENTS,
             favorite: false
         };
     }
@@ -88,8 +96,8 @@ class CampsiteInfo extends Component {
 
     render() {
         const campsiteId = this.props.navigation.getParam("campsiteId");
-        const campsite = this.state.campsites.filter(campsite => campsite.id === campsiteId)[0];
-        const comments = this.state.comments.filter(comment => comment.campsiteId === campsiteId);
+        const campsite = this.props.campsites.campsites.filter(campsite => campsite.id === campsiteId)[0];
+        const comments = this.props.comments.comments.filter(comment => comment.campsiteId === campsiteId);
         return (
           <ScrollView>
             <RenderCampsite campsite={campsite} 
@@ -102,4 +110,4 @@ class CampsiteInfo extends Component {
     }
 }
 
-export default CampsiteInfo;
+export default connect(mapStateToProps)(CampsiteInfo);

@@ -1,7 +1,18 @@
 import React, { Component } from "react";
 import { ScrollView, FlatList, Text} from "react-native";
 import { ListItem, Card} from "react-native-elements";
-import { PARTNERS } from "../shared/partners";
+import { connect } from "react-redux";
+import { baseUrl } from "../shared/baseUrl";
+
+//The mapStateToProps function receives the state as a prop and returns the parthers data from the state
+//In the FlatList at the bottom, after introducing redux and the json server we are no longer using this.state.partners but had to replace it with
+//this.props.partners.partnes - the first partners ref. to the entire part of the state including the error messages, loading etc, including the actual partners array. The second partners is exactly that array that we are grabbing from the state.
+
+const mapStateToProps = state => {
+    return {
+        partners: state.partners
+    };
+};
 
 
 function Mission() {
@@ -19,14 +30,7 @@ function Mission() {
 
 
 class About extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            partners: PARTNERS
-        };
-
-    }
-
+   
     static navigationOptions = {
         title: "About Us"
     }
@@ -38,7 +42,7 @@ class About extends Component {
                 <ListItem
                     title={item.name}
                     subtitle={item.description}
-                    leftAvatar={{ source: require('./images/bootstrap-logo.png')}}
+                    leftAvatar={{ source: {uri: baseUrl + item.image}}}
                 />
             );
         };
@@ -48,7 +52,7 @@ class About extends Component {
                 <Mission />
                 <Card title="Community Partners">
                     <FlatList 
-                        data= {this.state.partners}
+                        data= {this.props.partners.partners}
                         renderItem={renderPartner}
                         keyExtractor={item => item.id.toString()}
                     />
@@ -59,4 +63,4 @@ class About extends Component {
     }
 }
 
-export default About
+export default connect(mapStateToProps)(About);

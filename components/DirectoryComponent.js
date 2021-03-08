@@ -1,7 +1,10 @@
 import React, { Component } from "react";
 import { FlatList } from "react-native";
-import { ListItem} from "react-native-elements";
-import { CAMPSITES } from "../shared/campsites";
+//import { ListItem} from "react-native-elements";
+import { Tile } from "react-native-elements";
+import { connect } from "react-redux";
+import { campsites } from "../redux/campsites";
+import { baseUrl } from "../shared/baseUrl";
 
 //FlatList is somewhat simillar to <ol> tag and ListItem - to <li>
 //FlatList has several props: data expects and array of data;renderItem-will specify how to render each item in the list. It will do that by using a call back function
@@ -22,15 +25,16 @@ import { CAMPSITES } from "../shared/campsites";
 //Instead we will use the navigate function which will take 2 arguments. The first one is the name of the screen we want to navigate to, and the second(optional) argument adds more parameters to the route.
 //In this case that addl parameter will be the campsiteId and we will give it the value of the id of the campsite that was pressed.Now when an item is pressed it will call this navigate function in order to switch to the CampsiteInfo screen, and the camspiteId parameter will be used to pass the correct campsite object to it.
 
+//After introducing redux and json server, all data is being pulled from redux. Also we are replacing ListItem with Tile. The tile has a caption attribute instead of subtitle and a featured attribute which changes the appearance of the Tile. We also replaced the leftAvatar with imageSrc for the Tile and we are pulling the image from json server now.
+
+
+const mapStateToProps = state => {
+    return {
+        campsites: state.campsites
+    };
+};
 
 class Directory extends Component {
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            campsites: CAMPSITES
-        };
-    }
 
     static navigationOptions = {
         title: "Directory"
@@ -40,12 +44,14 @@ class Directory extends Component {
         const { navigate } = this.props.navigation;
         const renderDirectoryItem = ({item}) => {
             return (
-                <ListItem
+                <Tile
                     title={item.name}
-                    subtitle={item.description}
+                    caption={item.description}
+                    featured
                    // onPress={() => props.onPress(item.id)}
                       onPress = {() => navigate("CampsiteInfo", { campsiteId: item.id })}
-                    leftAvatar={{ source: require("./images/react-lake.jpg")}}
+                    //leftAvatar={{ source: require("./images/react-lake.jpg")}}
+                    imageSrc={{uri: baseUrl + item.image}}
                 />
 
             );
@@ -53,7 +59,7 @@ class Directory extends Component {
         
         return (
             <FlatList
-                data={this.state.campsites}
+                data={this.props.campsites.campsites}
                 renderItem={renderDirectoryItem}
                 keyExtractor={item => item.id.toString()}
             />
@@ -61,4 +67,4 @@ class Directory extends Component {
     }
 }
 
-export default Directory;
+export default connect(mapStateToProps)(Directory);

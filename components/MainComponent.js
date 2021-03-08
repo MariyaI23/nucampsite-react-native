@@ -10,6 +10,13 @@ import { createDrawerNavigator, DrawerItems } from "react-navigation-drawer";
 import { createAppContainer } from "react-navigation";
 import { Icon } from "react-native-elements";
 import SafeAreaView from "react-native-safe-area-view";
+import { connect } from "react-redux";
+import {
+  fetchCampsites,
+  fetchComments,
+  fetchPromotions,
+  fetchPartners,
+} from "../redux/ActionCreators";
 
 //The createStackNavigator is a function which return value we will store in the DirectoryNavigator. The function has 1 required argument called the routeConfig object.This object will hold the components which will be part of the navigation stack.
 //The second argument of the createStackNavigator function is optional. The initialRoutName-sets the default view of whichever component we want displyed first when the app loads.
@@ -17,6 +24,16 @@ import SafeAreaView from "react-native-safe-area-view";
 //We will be passing the createStackNavigator(or rather tha variable DirectoryNavigator which holds it's return value) to the next function we imported-createAppContainer. We will assign the return value of createAppContainer to a variable named AppNavigator. The createAppContainer will return our top-level Navigator Component and connect it to the React-Native environment. Most often we will have to wrapp our top navigator component in a createAppContainer like this.
 //We can specify specific navigationOptions for each screen. We are passing the navigation prop to the onPress event so we can use the built-in function toggleDrawer() of the navigation prop. That way when the icon is pressed it will open the side drawer.
 //In the Home/About/Contact Navigators we can continue to use the default Navigations option as it is only one screen. We can destructure the navigation prop and use an arrow function. After the => we are using a set of () around the {} so the function doesn't think that we are entering a function body as we are not. We are defining an object literal. As that is also surrounded by {} the arrow function might consider it as the body of the function.
+//After introducing redux and json server we are now needing to dispatch our action creators. Those listed action creators have been thunked in order to send async calls to json server to bring back data from the there.
+//the mapDispatchToProps allows us to use these action creators as props just as mapStateToProps allows us to use state data as props. The action creators will be called in the componentDidMount method just above the render() method of the Main Component
+
+const mapDispatchToProps = {
+  fetchCampsites,
+  fetchComments,
+  fetchPromotions,
+  fetchPartners
+};
+
 
 const DirectoryNavigator = createStackNavigator(
   {
@@ -238,6 +255,13 @@ class Main extends Component {
   //The paddingTop property of the style object will need to utilize the Platform API we imported from react-native. That will help us set some conditions to check if the devise is IOS or not using the ternary operator. The reason is that on different devices the padding will render differently so we need to be able to handle both cases.
   //If the Platform Operating System is "ios" the padding will be 0, if not, we will use the value given to us by Expo which sets the statusBarHight dinamically
 
+  componentDidMount() {
+    this.props.fetchCampsites();
+    this.props.fetchComments();
+    this.props.fetchPromotions();
+    this.props.fetchPartners();
+  }
+
   render() {
     return (
       <View
@@ -290,4 +314,6 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Main;
+//Since we don't have mapStateToProps here, the first argument in the connect method should be null, the second argument will be the mapDispatchToProps. This is how the Main component will get access to the action creators.
+
+export default connect(null, mapDispatchToProps)(Main);
