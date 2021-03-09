@@ -4,6 +4,7 @@ import { View, Text, ScrollView } from "react-native";
 import { Card } from "react-native-elements";
 import { connect } from "react-redux";
 import { baseUrl } from "../shared/baseUrl";
+import Loading from "./LoadingComponent";
 
 //The ScrollView component can be used to render lists of items like FlatList can be used for that as well.
 //Major difference between the two is that FlatList uses LazyLoading(it renders the items that are in the visible part of the screen or just aboutto become visible. Those that are scrolled far off screen are removed from memory to improve perforamnce)
@@ -20,7 +21,22 @@ const mapStateToProps = state => {
     }
 }
 
-function RenderItem({ item }) {
+function RenderItem(props) {
+
+    const {item} = props;
+
+    if(props.isLoading) {
+        return <Loading />;
+    }
+
+    if(props.errMess) {
+        return (
+            <View>
+                <Text>{props.errMess}</Text>
+            </View>
+        );
+    }
+
     if(item) {
         return (
             <Card
@@ -50,12 +66,18 @@ class Home extends Component {
              <ScrollView>
                  <RenderItem 
                      item={this.props.campsites.campsites.filter(campsite => campsite.featured)[0]}
+                     isLoading={this.props.campsites.isLoading}
+                     errMess={this.props.campsites.errMess}
                  />
                  <RenderItem 
                      item={this.props.promotions.promotions.filter(promotion => promotion.featured)[0]}
+                     isLoading={this.props.promotions.isLoading}
+                     errMess={this.props.promotions.errMess}
                  />
                  <RenderItem
                      item={this.props.partners.partners.filter(partner => partner.featured)[0]}
+                     isLoading={this.props.partners.isLoading}
+                     errMess={this.props.partners.errMess}
                 />
              </ScrollView>
         );

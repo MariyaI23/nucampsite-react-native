@@ -3,6 +3,7 @@ import { ScrollView, FlatList, Text} from "react-native";
 import { ListItem, Card} from "react-native-elements";
 import { connect } from "react-redux";
 import { baseUrl } from "../shared/baseUrl";
+import Loading from "./LoadingComponent";
 
 //The mapStateToProps function receives the state as a prop and returns the parthers data from the state
 //In the FlatList at the bottom, after introducing redux and the json server we are no longer using this.state.partners but had to replace it with
@@ -47,6 +48,28 @@ class About extends Component {
             );
         };
 
+        if(this.props.partners.isLoading) {
+            return (
+              <ScrollView>
+                <Mission />
+                <Card title="Community Partners">
+                    <Loading />
+                </Card>
+              </ScrollView>
+            );
+        }
+
+        if(this.props.partners.errMess) {
+            return (
+              <ScrollView>
+                <Mission />
+                <Card title="Community Partners">
+                  <Text>{this.props.partners.errMess}</Text>
+                </Card>
+              </ScrollView>
+            );
+        }
+
         return (
             <ScrollView>
                 <Mission />
@@ -57,7 +80,6 @@ class About extends Component {
                         keyExtractor={item => item.id.toString()}
                     />
                 </Card>
-                
             </ScrollView>
         );
     }
