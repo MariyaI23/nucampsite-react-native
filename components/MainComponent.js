@@ -4,6 +4,7 @@ import Directory from "./DirectoryComponent";
 import CampsiteInfo from "./CampsiteInfoComponent";
 import About from "./AboutComponent";
 import Contact from "./ContactComponent";
+import Reservation from "./ReservationComponent";
 import { View, Platform, StyleSheet, Text, ScrollView, Image } from "react-native";
 import { createStackNavigator } from "react-navigation-stack";
 import { createDrawerNavigator, DrawerItems } from "react-navigation-drawer";
@@ -133,6 +134,29 @@ const ContactNavigator = createStackNavigator(
   }
 );
 
+const ReservationNavigator = createStackNavigator(
+  {
+    Reservation: { screen: Reservation }
+  },
+  {
+    defaultNavigationOptions: ({navigation}) => ({
+      headerStyle: {
+        backgroundColor: "#5637DD"
+      },
+      headerTintColor: "#fff",
+      headerTitleStyle: {
+        color: "#fff"
+      },
+        headerLeft: <Icon
+            name="tree"
+            type="font-awesome"
+            iconStyle={styles.stackIcon}
+            onPress={() => navigation.toggleDrawer()}
+          />
+    })
+  }
+);
+
 //Creating the drawer navigator. The createDrawerNavigator function will have the first argument be an object that contains the screens(views) that will be in the drawer
 //We want to route through the stack navigator, that is why we are setting up the screens to render the HomeNavigator and the DirectoryNavigator instead of just the Home and the Directory components.
 //In the optional second argument for addl configuration we can set the drawer's background color
@@ -194,6 +218,20 @@ const MainNavigator = createDrawerNavigator(
           />
         )
       }
+     },
+     Reservation: {
+       screen: ReservationNavigator,
+       navigationOptions: {
+          drawerLabel: "Reserve Campsite",
+          drawerIcon: ({tintColor}) => (
+            <Icon
+                name="tree"
+                type="font-awesome"
+                size={24}
+                color={tintColor}
+            />
+          )
+       }
      },
     About: { 
       screen: AboutNavigator,
