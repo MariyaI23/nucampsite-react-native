@@ -3,6 +3,7 @@ import { Text, View, ScrollView, FlatList } from "react-native";
 import { Card, Icon } from "react-native-elements";
 import { connect } from "react-redux";
 import { baseUrl } from "../shared/baseUrl";
+import { postFavorite } from "../redux/ActionCreators";
 
 //From the props we will pull the campsite object and send it another component - the RenderCampsite.
 //The RenderCampsite component will receive in it's parameter list the property "campsite" from the destructured campsite object it recieved as props. Later on we needed addl props so just added props in the parameter list so we can receive all of them. Then inside the function we still destructured the {campsite} prop
@@ -18,14 +19,19 @@ import { baseUrl } from "../shared/baseUrl";
 //The name prop of the Icon component is set up to check if it has received from props the favorite property as true or false. If true-that means the heart icon will be displayed in solid color, if false-it will just be outlined.
 
 //After introducing redux and json server we are now getting all of the state data from redux
+//Since we are now tracking the campsiteId through the store we need to pass it to markFavorite.
 
 const mapStateToProps = state => {
     return {
         campsites: state.campsites,
-        comments: state.comments
+        comments: state.comments,
+        favorites: state.favorites
     }
 }
 
+const mapDispatchToProps = {
+    postFavorite: campsiteId => (postFavorite(campsiteId))
+};
 
 function RenderCampsite(props) {
 
@@ -79,15 +85,9 @@ function RenderComments({comments}) {
 }
 
 class CampsiteInfo extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            favorite: false
-        };
-    }
 
-    markFavorite() {
-        this.setState({favorite: true})
+    markFavorite(campsiteId) {
+        this.props.postFavorite(campsiteId);
     }
 
     static navigationOptions = {
@@ -101,8 +101,8 @@ class CampsiteInfo extends Component {
         return (
           <ScrollView>
             <RenderCampsite campsite={campsite} 
-                favorite={this.state.favorite}
-                markFavorite={() => this.markFavorite()}
+                favorite={this.props.favorites.includes(campsiteId)}
+                markFavorite={() => this.markFavorite(campsiteId)}
             />
             <RenderComments comments={comments} />
           </ScrollView>
@@ -110,4 +110,4 @@ class CampsiteInfo extends Component {
     }
 }
 
-export default connect(mapStateToProps)(CampsiteInfo);
+export default connect(mapStateToProps, mapDispatchToProps)(CampsiteInfo);
