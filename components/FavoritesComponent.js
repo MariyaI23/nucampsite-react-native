@@ -7,6 +7,7 @@ import { baseUrl } from "../shared/baseUrl";
 import { SwipeRow } from "react-native-swipe-list-view";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { deleteFavorite } from "../redux/ActionCreators";
+import * as Animatable from "react-native-animatable";
 
 //This component will displaying only the favorited campsites. In it's return method we are rendering a FlatList.
 //In the FlatList we are using the data prop to access the campsites part of the whole campsites object. Then we need to filter through that to find
@@ -98,13 +99,17 @@ class Favorites extends Component {
             );
         }
 
-        return(
+        return (
+          <Animatable.View animation="fadeInRightBig" duration={2000}>
             <FlatList
-                data={this.props.campsites.campsites.filter(campsite => this.props.favorites.includes(campsite.id))}
-                renderItem={renderFavoriteItem}
-                keyExtractor={item => item.id.toString()}
+              data={this.props.campsites.campsites.filter((campsite) =>
+                this.props.favorites.includes(campsite.id)
+              )}
+              renderItem={renderFavoriteItem}
+              keyExtractor={(item) => item.id.toString()}
             />
-        )
+          </Animatable.View>
+        );
 
     }
 }

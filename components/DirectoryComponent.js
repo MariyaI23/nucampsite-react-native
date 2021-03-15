@@ -6,6 +6,7 @@ import { connect } from "react-redux";
 import { campsites } from "../redux/campsites";
 import { baseUrl } from "../shared/baseUrl";
 import Loading from "./LoadingComponent";
+import * as Animatable from "react-native-animatable";
 
 //FlatList is somewhat simillar to <ol> tag and ListItem - to <li>
 //FlatList has several props: data expects and array of data;renderItem-will specify how to render each item in the list. It will do that by using a call back function
@@ -45,16 +46,22 @@ class Directory extends Component {
         const { navigate } = this.props.navigation;
         const renderDirectoryItem = ({item}) => {
             return (
+              <Animatable.View
+                animation="fadeInRightBig"
+                duration={2000}
+              >
                 <Tile
-                    title={item.name}
-                    caption={item.description}
-                    featured
-                   // onPress={() => props.onPress(item.id)}
-                      onPress = {() => navigate("CampsiteInfo", { campsiteId: item.id })}
-                    //leftAvatar={{ source: require("./images/react-lake.jpg")}}
-                    imageSrc={{uri: baseUrl + item.image}}
+                  title={item.name}
+                  caption={item.description}
+                  featured
+                  // onPress={() => props.onPress(item.id)}
+                  onPress={() =>
+                    navigate("CampsiteInfo", { campsiteId: item.id })
+                  }
+                  //leftAvatar={{ source: require("./images/react-lake.jpg")}}
+                  imageSrc={{ uri: baseUrl + item.image }}
                 />
-
+              </Animatable.View>
             );
         };
         
