@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { FlatList, View, Text, StyleSheet } from "react-native";
+import { FlatList, View, Text, StyleSheet, Alert } from "react-native";
 import { ListItem } from "react-native-elements";
 import { connect } from "react-redux";
 import { Loading } from "./LoadingComponent";
@@ -17,6 +17,13 @@ import { deleteFavorite } from "../redux/ActionCreators";
 //The SwipeRow component will surround the ListItem as we want to unable the ListItem to be swiped to have the additional functionallity become visible.
 //The rightOpneValue prop of the SwipeRow determines that the user can swipe from the right. It takes a negative whole number which represents the number of pixels which the user will have to swipe from right to left for this row to open.
 //The SwipeRow expects 2 View components after that. The first View will hold the things that stay hidden until the user swipes. The second View will hold the things that are shown on the screen by default before the user swipes.
+//The TouchableOpacity component has a built in onPress prop. After importing Alert(built-in component from react-native), once the user presses on the revieled after swiping Delete button, an Alert will appear to check if the user is shure he wants to delete the afvorited item.
+//We need to call the alert() method on the Alert component-Alert.alert(). The alert() method takes several parameters.
+//The first parameter will be title we want to display in the Alert dialog box. The second parameter will be a short message we want to show in the dialog box.
+//The third parameter is the set of actions this alert dialog needs to support. This will be presnted as an array of objects.Each object in this array will represent a button in the alert dialog box.
+//Each button will have a text property naming the button, and an onPress method which will execute a function. The style prop with a value of "cancel" will affect the button's color.
+//The "OK" button will mean the user is sure he wants to delete the item, so the onPress method will call the deletefavorite function which we imported with an argument of that specific campsite's id.
+//After the array of button object, we are adding another optional parameter-an object which will hold the property of cancelable set to false. By default Alerts on Android can be dismissed by tapping outside of the alert box. This parameter will disable that behavior, so the user is forced to choose eithe "cancel" or "ok" to exit the alert box.
 
 const mapStateToProps = state => {
     return {
@@ -43,7 +50,24 @@ class Favorites extends Component {
                 <View style={styles.deleteView}>
                     <TouchableOpacity
                         style={styles.deleteTouchable}
-                        onPress={() => this.props.deleteFavorite(item.id)}
+                        onPress={() => 
+                            Alert.alert(
+                                "Delete Favorite ?",
+                                "Are you sure you wish to delete the favorite campsite " + item.name + "?",
+                                [
+                                    {
+                                        text: "Cancel",
+                                        onPress: () => console.log(item.name + " Not Deleted"),
+                                        style: "cancel"
+                                    },
+                                    {
+                                        text: "OK",
+                                        onPress: () => this.props.deleteFavorite(item.id)
+                                    },
+                                ],
+                                { cancelable: false }
+                            )
+                        }
                     >
                         <Text style={styles.deleteText}>Delete</Text>
                     </TouchableOpacity>
@@ -104,7 +128,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         width: 100
     }
-})
+});
 
 
 export default connect(mapStateToProps, mapDispatchToProps)(Favorites);

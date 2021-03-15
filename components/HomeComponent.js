@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { render } from "react-dom";
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, Animated } from "react-native";
 import { Card } from "react-native-elements";
 import { connect } from "react-redux";
 import { baseUrl } from "../shared/baseUrl";
@@ -10,6 +10,7 @@ import Loading from "./LoadingComponent";
 //Major difference between the two is that FlatList uses LazyLoading(it renders the items that are in the visible part of the screen or just aboutto become visible. Those that are scrolled far off screen are removed from memory to improve perforamnce)
 //ScrollView however, renders all of its child components at once. If we have a long list of components-FlatList is a better choice.
 //In ScrollView we will be rendering 3 cards to display the featured campsite, promotion and partner. Since they will have very simillar structure, we'll create a RenderItem component to use for them
+//Later the ScrollView was replaced by Animated to add animations
 
 
 const mapStateToProps = state => {
@@ -56,6 +57,27 @@ function RenderItem(props) {
 
 
 class Home extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            scaleValue: new Animated.Value(0)
+        }
+    }
+
+    animate() {
+        Animated.timing(
+            this.state.scaleValue,
+            {
+                toValue: 1,
+                duration: 1500,
+                useNativeDriver: true
+            }
+        ).start();
+    }
+
+    componentDidMount(){
+        this.animate();
+    }
     
     static navigationOptions = {
         title: "Home"
@@ -63,7 +85,7 @@ class Home extends Component {
 
     render() {
         return (
-             <ScrollView>
+             <Animated.ScrollView style={{transform: [{scale: this.state.scaleValue}]}}>
                  <RenderItem 
                      item={this.props.campsites.campsites.filter(campsite => campsite.featured)[0]}
                      isLoading={this.props.campsites.isLoading}
@@ -79,7 +101,7 @@ class Home extends Component {
                      isLoading={this.props.partners.isLoading}
                      errMess={this.props.partners.errMess}
                 />
-             </ScrollView>
+             </Animated.ScrollView>
         );
     }
 
