@@ -63,7 +63,7 @@ function RenderCampsite(props) {
                 },
                 {
                   text: "OK",
-                  onPres: () => props.favorite ? console.log("Already set as a favorite") : props.markFavorite()
+                  onPress: () => props.favorite ? console.log("Already set as a favorite") : props.markFavorite()
                 }
               ],
               { cancelable: false }
