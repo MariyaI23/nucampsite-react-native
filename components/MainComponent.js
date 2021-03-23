@@ -7,7 +7,7 @@ import Contact from "./ContactComponent";
 import Reservation from "./ReservationComponent";
 import Favorites from "./FavoritesComponent";
 import Login from "./LoginComponent";
-import { View, Platform, StyleSheet, Text, ScrollView, Image } from "react-native";
+import { View, Platform, StyleSheet, Text, ScrollView, Image, Alert, ToastAndroid } from "react-native";
 import { createStackNavigator } from "react-navigation-stack";
 import { createDrawerNavigator, DrawerItems } from "react-navigation-drawer";
 import { createAppContainer } from "react-navigation";
@@ -20,6 +20,7 @@ import {
   fetchPromotions,
   fetchPartners,
 } from "../redux/ActionCreators";
+import NetInfo from "@react-native-community/netinfo";
 
 //The createStackNavigator is a function which return value we will store in the DirectoryNavigator. The function has 1 required argument called the routeConfig object.This object will hold the components which will be part of the navigation stack.
 //The second argument of the createStackNavigator function is optional. The initialRoutName-sets the default view of whichever component we want displyed first when the app loads.
@@ -358,6 +359,40 @@ class Main extends Component {
     this.props.fetchComments();
     this.props.fetchPromotions();
     this.props.fetchPartners();
+
+    NetInfo.fetch().then(connectionInfo => {
+        (Platform.OS === "ios") ? Alert.alert("Initial Network Connectivity Type:", connectionInfo.type) : ToastAndroid.show("Initial Network Connectivity Type:" + connectionInfo.type, ToastAndroid.LONG);
+    });
+
+    this.unsubscribeNetInfo = NetInfo.addEventListener(connectionInfo => {
+      this.handleConnectivityChange(connectionInfo);
+    });
+
+  }
+
+  componentWillUnmount() {
+    this.unsubscribeNetInfo();
+  }
+
+  handleConnectivityChange = connectionInfo => {
+    let connectionMsg = "You are now connected to an active network.";
+    switch(connectionInfo.type) {
+      case "none":
+        connectionMsg = "No network connection is active.";
+        break;
+      case "unknown":
+        connectionMsg = " The network connection state is now unknown.";
+        break;
+      case "cellular":
+        connectionMsg = "You are now connected to a cellular network.";
+        break;
+      case "wifi":
+        connectionMsg = " You are now connected to a WiFi network.";
+        break;
+    }
+    (Platform.OS === "ios")
+      ? Alert.alert("Connection change:", connectionMsg)
+      : ToastAndroid.show(connectionMsg, ToastAndroid.LONG);
   }
 
   render() {
